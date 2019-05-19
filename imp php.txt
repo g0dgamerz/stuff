@@ -1,0 +1,214 @@
+<!-- configuring database -->
+<?php
+$con = mysql_connect("localhost", "root", "");
+if (!$con)
+{
+	die("error in database connection");
+}
+$db = mysql_select_db ("database_name");
+if (!$db)
+{
+	die("error in database selection");
+}
+?>
+<!-- configuring database -->
+
+<!-- title dynamic -->
+<?php
+	$sql = "SELECT * FROM site"; 
+	$query = mysql_query($sql);
+	$row = mysql_fetch_object($query);
+?>
+<title><?php echo $row->title; ?></title>
+
+<!-- about dynamic -->
+<?php
+	$sql = mysql_query("SELECT * FROM menu WHERE menu_id='2'") or die(mysql_error());
+	while($row = mysql_fetch_object($sql))
+{
+	?>
+	<p><?php print $row->menu_full;?></p>
+	<?php
+}
+?>
+<!-- title dynamic -->
+
+
+<!-- image dynamic -->
+<?php
+	$sql = mysql_query("SELECT * FROM menu WHERE menu_id='2'") or die(mysql_error());
+	while($row = mysql_fetch_object($sql))
+	{
+	print '<div class="about-right"> <img src="images/'.$row->image.'" alt=""> </div>';
+	}
+?>
+<!-- image dynamic -->
+
+<!-- dynamic gallery with div in loop -->
+<div class="row">
+	<div class="to-ho-hotel">
+		<?php
+			$sql = mysql_query("SELECT * FROM page ORDER BY page_id LIMIT 6 ") or die(mysql_error());
+				while($row = mysql_fetch_object($sql)){?> 
+					<a href="activities.php">
+						<div class="col-md-4">
+							<div class="to-ho-hotel-con to-ho-hotel-con-block">
+								<div class="to-ho-hotel-con-1">
+									<img src="images/activities/<?php print $row->image ?>" alt="">
+								</div>	
+								<div class="to-ho-hotel-con-23">
+									<div class="to-ho-hotel-con-2"><h4><?php print $row->page_heading ?></h4> </div>
+									<div class="clearfix"></div>
+						        </div>
+							</div>
+						</div>
+					</a>
+		<?php } ?>
+	</div>
+</div>
+<!-- dynamic gallery with div in loop -->
+
+
+<!-- subscribe message/email -->
+<?php 
+	if (isset($_POST['submit_subs'])) {
+		$subscription = $_POST['subscription'];
+		$sql = mysql_query("INSERT INTO message(email,msg_type) VALUES ('$subscription','subcription')") OR die(mysql_error());
+
+		$status=1;
+	}
+?>
+
+<?php if (isset($status)) {?>
+	<div class="alert alert-success">
+		<p>Thank you for your subscription</p>		
+	</div>
+	<?php 
+	
+}
+?>
+<!-- subscribe message/email -->
+
+
+<!-- contact us message/email -->
+<?php 
+	if (isset($_POST['submit'])) {
+		$name = $_POST['name'];
+		$email = $_POST['email'];
+		$address = $_POST['address'];
+		$phone = $_POST['phone'];
+		$message = $_POST['message'];
+
+
+		$sql = mysql_query("INSERT INTO message(name,email,address,phone,message,msg_type) VALUES ('$name','$email','$address','$phone','$message','$Contact')") OR die(mysql_error());
+
+		$status=1;
+	}
+?>
+<!-- contact us message/email -->
+
+<!-- Assigning respective page ids to dynamic contents -->
+			<div class="row">
+						<div class="to-ho-hotel">
+		                    <?php
+		                    $page_id = $_GET['page_id'];
+		                    $sql = mysql_query("SELECT * FROM page WHERE page_id!=$page_id ORDER BY page_id LIMIT 6 ") or die(mysql_error());
+		                    while($row = mysql_fetch_object($sql))
+		                      {
+		                    ?>
+		                    <!-- link is the page id of that content --> 
+							<a href="activities_view.php?page_id=<?php print $row->page_id?>">
+								<div class="col-md-4">
+									<div class="to-ho-hotel-con to-ho-hotel-con-block">
+										<div class="to-ho-hotel-con-1">
+											<img src="images/activities/<?php print $row->image ?>" alt="">
+										</div>
+										<div class="to-ho-hotel-con-23">
+											<div class="to-ho-hotel-con-2"><h4><?php print $row->page_heading ?></h4> </div>
+											<div class="clearfix"></div>
+					                	</div>
+									</div>
+								</div>
+							 </a>
+							<?php } ?>
+						</div>
+					</div>
+				</div>
+
+<!-- convert string into lower case and replace space with - -->
+$gallery_url = str_replace(" ", "-", strtolower($gallery_name));
+
+strtolower("string");
+str_replace($search, $replace, $subject);
+<!-- convert string into lower case and replace space with - -->
+
+
+<!-- print date automatically -->
+<?php echo date(" Y, M "); ?>
+
+<!-- subscription check -->
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <?php
+                        if(isset($_POST['subscribe_btn']))
+                        {
+                            $email= $_POST['email'];
+                            $name= $_POST['name'];
+
+                            $query = mysql_query("SELECT email FROM message WHERE email='$email'");
+                            if (mysql_num_rows($query) != 0)
+                            {
+                                echo '<div class="alert alert-danger"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> <strong>Sorry!</strong> This Email already exists</div>';
+                            }
+                            else
+                            {
+                                $result = mysql_query("INSERT INTO message (email,name,msg_type,message_date,message_time) VALUES('$email','$name','Subscribe',curdate(),curtime())") or die(mysql_error());
+                                if($result)
+                                    echo '<div class="alert alert-success"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> <strong>Well done!</strong> Thank You !! We will get back you Soon</a>. </div></p>';
+                                else
+                                    echo '<div class="alert alert-danger"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button> Error in Subscribtion Enter. </div>';
+                            }
+                        }
+                    ?>
+
+                    <div class="footer-item newsletter">
+                        <div class="main-title-2">
+                            <h1>Newsletter</h1>
+                        </div>
+                        <div class="newsletter-inner">
+                            <form action="" method="POST">
+                                <p><input type="text" class="form-contact" name="name" placeholder="Enter your Full Name"></p>
+                                <p><input type="email" class="form-contact" name="email" placeholder="Enter your Email"></p>
+                                <p><button type="submit" name="subscribe_btn" class="btn btn-small">Subscribe Now</button></p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- timer wala  -->
+             <?php if (isset($status4)) {    ?>
+                <div>
+                    <div class="alert alert-success" id="subscribeBox" style="text-align: center;">
+                        <p style="color: #88af0c;font-family: 'Tangerine', cursive;font-size: 50px;">You have joined.</p>
+                    </div>
+                        <script type="text/javascript">
+                        setTimeout(function(){
+                        document.getElementById('subscribeBox').style.display = "none";
+                        }, 5000);
+                        </script>
+                </div>
+                <?php } ?>
+            <!-- timer wala -->
+
+
+                                <p><?php print $row->address; ?></p>
+                      <?php 
+                        $phones = explode(',', $phone);
+                      ?>
+                      <p>Tel: 
+                        <?php foreach ($phones as $key => $value) {
+                          ?><a href="tel:<?php print $value; ?>"><?print $value;
+                          print "<br>";
+                        } ?></a>
+                      </p>
